@@ -1,0 +1,7 @@
+# Netlify publishes the pre-built site. The report is generated in CI (see
+# .github/workflows/deploy.yml), which records the Playwright video and runs
+# `executable-stories format … --asset-mode copy` to bundle the media. Netlify
+# itself only serves the resulting dist/ directory.
+[build]
+  publish = "dist"
+  command = "echo 'Built in CI — see .github/workflows/deploy.yml'"
