@@ -1,7 +1,16 @@
-# Netlify publishes the pre-built site. The report is generated in CI (see
-# .github/workflows/deploy.yml), which records the Playwright video and runs
-# `executable-stories format … --asset-mode copy` to bundle the media. Netlify
-# itself only serves the resulting dist/ directory.
+# Netlify builds the demo straight from Git — no external token. On each push it
+# installs deps, installs the Playwright browser, runs the story tests (recording
+# the video + screenshot), and runs `executable-stories format … --asset-mode copy`
+# to bundle the media into dist/, which Netlify then publishes.
+#
+# Note: --with-deps is intentionally omitted (it needs apt/root, which Netlify's
+# build sandbox doesn't grant). We rely on the build image already shipping
+# Chromium's shared libraries. If a build ever fails with a missing lib such as
+# libnss3 at browser launch, the fallback is to build in GitHub Actions
+# (ubuntu-latest + `playwright install --with-deps`) and deploy via the CLI.
 [build]
   publish = "dist"
-  command = "echo 'Built in CI — see .github/workflows/deploy.yml'"
+  command = "pnpm install && pnpm exec playwright install chromium && pnpm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
